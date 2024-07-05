@@ -139,12 +139,12 @@ module "cosmos_account" {
 }
 
 module "log_analytics_workspace" {
-  source = "git::git@ssh.dev.azure.com:v3/JasperEnginesTransmissions/JETDEV/TerraformModule_AzureResourceTypes"
+  source = "git::https://github.com/TaleLearnCode/azure-resource-types.git"
   resource_type = "log-analytics-workspace"
 }
 
 module "application_insights" {
-  source = "git::git@ssh.dev.azure.com:v3/JasperEnginesTransmissions/JETDEV/TerraformModule_AzureResourceTypes"
+  source = "git::https://github.com/TaleLearnCode/azure-resource-types.git"
   resource_type = "application-insights"
 }
 
