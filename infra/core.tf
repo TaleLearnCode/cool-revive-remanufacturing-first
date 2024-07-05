@@ -68,3 +68,29 @@ resource "azurerm_servicebus_namespace" "remanufacturing" {
   sku                 = "Standard"
   tags                = local.tags
 }
+
+# #############################################################################
+# Log Analytics Workspace
+# #############################################################################
+
+resource "azurerm_log_analytics_workspace" "log_analytics" {
+  name                = lower("${module.log_analytics_workspace.name.abbreviation}-CoolRevive${var.resource_name_suffix}-${var.azure_environment}-${module.azure_regions.region.region_short}")
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+  tags                = local.tags
+}
+
+# #############################################################################
+# Application Insights
+# #############################################################################
+
+resource "azurerm_application_insights" "app_insights" {
+  name                = lower("${module.application_insights.name.abbreviation}-CoolRevive${var.resource_name_suffix}-${var.azure_environment}-${module.azure_regions.region.region_short}")
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+  workspace_id        = azurerm_log_analytics_workspace.log_analytics.id
+  application_type    = "web"
+  tags                = local.tags
+}

@@ -138,6 +138,16 @@ module "cosmos_account" {
   resource_type = "azure-cosmos-db-for-nosql-account"
 }
 
+module "log_analytics_workspace" {
+  source = "git::git@ssh.dev.azure.com:v3/JasperEnginesTransmissions/JETDEV/TerraformModule_AzureResourceTypes"
+  resource_type = "log-analytics-workspace"
+}
+
+module "application_insights" {
+  source = "git::git@ssh.dev.azure.com:v3/JasperEnginesTransmissions/JETDEV/TerraformModule_AzureResourceTypes"
+  resource_type = "application-insights"
+}
+
 module "event_grid_topic" {
   source = "git::https://github.com/TaleLearnCode/azure-resource-types.git"
   resource_type = "event-grid-topic"
@@ -151,4 +161,18 @@ module "service_bus_topic" {
 module "service_bus_topic_subscription" {
   source = "git::https://github.com/TaleLearnCode/azure-resource-types.git"
   resource_type = "service-bus-topic-subscription"
+}
+module "app_service_plan" {
+  source = "git::https://github.com/TaleLearnCode/azure-resource-types.git"
+  resource_type = "app-service-plan"
+}
+
+module "function_app" {
+  source = "git::https://github.com/TaleLearnCode/azure-resource-types.git"
+  resource_type = "function-app"
+}
+
+module "storage_account" {
+  source        = "git::https://github.com/TaleLearnCode/azure-resource-types.git"
+  resource_type = "storage-account"
 }
