@@ -1,5 +1,3 @@
-# terraform apply -var 'azure_environment=dev' -var 'azure_region=northcentralus' -var 'resource_name_suffix=random'
-
 # #############################################################################
 #                          Terraform Configuration
 # #############################################################################
@@ -55,17 +53,19 @@ module "storage_account" {
 
 variable "azure_region" {
 	type        = string
+  default     = "eastus2"
 	description = "Location of the resource group."
 }
 
 variable "azure_environment" {
 	type        = string
-	description = "The environment component of an Azure resource name. Valid values are dev, qa, e2e, core, and prod."
+  default     = "dev"
+	description = "The environment component of an Azure resource name."
 }
 
 variable "resource_name_suffix" {
   type        = string
-  default     = ""
+  default     = "random"
   description = "The suffix to append to the resource names."
 }
 
@@ -74,8 +74,8 @@ variable "resource_name_suffix" {
 # #############################################################################
 
 resource "random_integer" "identifier" {
-  min = 220
-  max = 899
+  min = 100
+  max = 999
   keepers = {
     test_name = "${var.azure_environment}_${var.azure_region}"
   }
@@ -112,7 +112,7 @@ data "azurerm_client_config" "current" {}
 # #############################################################################
 
 resource "azurerm_resource_group" "rg" {
-  name     = "${module.resource_group.name.abbreviation}-TerraformState${local.resource_suffix}-${var.azure_environment}-${module.azure_regions.region.region_short}"
+  name     = "${module.resource_group.name.abbreviation}-CoolRevive-${var.azure_environment}-${module.azure_regions.region.region_short}"
   location = module.azure_regions.region.region_cli
   tags     = local.tags
 }
@@ -122,7 +122,7 @@ resource "azurerm_resource_group" "rg" {
 # #############################################################################
 
 resource "azurerm_storage_account" "st" {
-  name                            = lower("${module.storage_account.name.abbreviation}Terraform${var.resource_name_suffix}${var.azure_environment}${module.azure_regions.region.region_short}")
+  name                            = lower("${module.storage_account.name.abbreviation}Terraform${local.resource_suffix}${var.azure_environment}${module.azure_regions.region.region_short}")
   resource_group_name             = azurerm_resource_group.rg.name
   location                        = azurerm_resource_group.rg.location
   account_tier                    = "Standard"
@@ -182,8 +182,28 @@ resource "local_file" "post-config" {
   content  = <<EOF
 storage_account_name = "${azurerm_storage_account.st.name}"
 container_name = "terraform-state"
-key = "iac.tfstate"
+key = "remote-state.tfstate"
 sas_token = "${data.azurerm_storage_account_sas.state.sas}"
 
   EOF
+}
+
+# #############################################################################
+#                              Output Variables
+# #############################################################################
+
+output "azure_region" {
+  value = var.azure_region
+}
+
+output "azure_environment" {
+  value = var.azure_environment
+}
+
+output "resource_name_suffix" {
+  value = local.resource_suffix
+}
+
+output "resource_group_name" {
+  value = azurerm_resource_group.rg.name
 }
