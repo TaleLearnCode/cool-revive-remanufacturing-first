@@ -22,8 +22,9 @@ jobs:
 
     # Log in to Azure
     - name: Azure Login
-      uses: azure/login@v1
+      uses: azure/login@v2
       with:
+        auth-type: SERVICE_PRINCIPAL
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     # Install the latest version of Terraform
