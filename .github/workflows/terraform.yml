@@ -9,6 +9,12 @@ on:
 
 jobs:
   terraform:
+    name: 'Terraform'
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
     runs-on: ubuntu-latest
 
     defaults:
@@ -21,11 +27,11 @@ jobs:
       uses: actions/checkout@v4
 
     # Log in to Azure
-    - name: Azure Login
-      uses: azure/login@v2
-      with:
-        auth-type: SERVICE_PRINCIPAL
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    #- name: Azure Login
+    #  uses: azure/login@v2
+    #  with:
+    #    auth-type: SERVICE_PRINCIPAL
+    #    creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     # Install the latest version of Terraform
     - name: Setup Terraform
