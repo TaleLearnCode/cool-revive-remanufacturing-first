@@ -28,13 +28,13 @@ resource "azurerm_servicebus_topic" "order_next_core" {
    ]
 }
 
-# SendNextCoreRequestToWarehouse (ebt-SendNextCoreRequestToWarehouseXXX-dev-cus) -> OrderNextCore (sbt-OrderNextCore-dev-cus
-resource "azurerm_eventgrid_event_subscription" "send_next_core_request_to_warehouse" {
-  name                          = "SendNextCoreRequestToWarehouse"
-  scope                         = azurerm_eventgrid_topic.send_next_core_request_to_warehouse.id
-  service_bus_queue_endpoint_id = azurerm_servicebus_topic.order_next_core.id
-  depends_on = [
-    azurerm_servicebus_topic.order_next_core,
-    azurerm_eventgrid_topic.send_next_core_request_to_warehouse
-  ]
-}
+## SendNextCoreRequestToWarehouse (ebt-SendNextCoreRequestToWarehouseXXX-dev-cus) -> OrderNextCore (sbt-OrderNextCore-dev-cus
+#resource "azurerm_eventgrid_event_subscription" "send_next_core_request_to_warehouse" {
+#  name                          = "SendNextCoreRequestToWarehouse"
+#  scope                         = azurerm_eventgrid_topic.send_next_core_request_to_warehouse.id
+#  service_bus_queue_endpoint_id = azurerm_servicebus_topic.order_next_core.id
+#  depends_on = [
+#    azurerm_servicebus_topic.order_next_core,
+#    azurerm_eventgrid_topic.send_next_core_request_to_warehouse
+#  ]
+#}
