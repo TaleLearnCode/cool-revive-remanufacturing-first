@@ -1,5 +1,3 @@
-# .github/workflows/terraform.yml
-
 name: Terraform
 
 on:
@@ -26,21 +24,13 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    # Log in to Azure
-    #- name: Azure Login
-    #  uses: azure/login@v2
-    #  with:
-    #    auth-type: SERVICE_PRINCIPAL
-    #    creds: ${{ secrets.AZURE_CREDENTIALS }}
-
     # Install the latest version of Terraform
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
 
     # Initialize the Terraform project
     - name: Terraform Init
-      #run: terraform init -backend-config="storage_account_name=${{ secrets.TERRAFORM_STORAGE_ACCOUNT_NAME }}" -backend-config="container_name=terraform-state" -backend-config="key=remanufacturing.tfstate" -backend-config="access_key=${{ secrets.TERRAFORM_STORAGE_ACCOUNT_KEY }}"
-      run: terraform init -backend-config="storage_account_name=${{ secrets.TERRAFORM_STORAGE_ACCOUNT_NAME }}" -backend-config="container_name=terraform-state" -backend-config="key=remanufacturing.tfstate" -backend-config="resource_group_name=${{ secrets.TERRAFORM_RESOURCE_GROUP }}"
+      run: terraform init -backend-config="resource_group_name=${{ secrets.TERRAFORM_RESOURCE_GROUP }}" -backend-config="storage_account_name=${{ secrets.TERRAFORM_STORAGE_ACCOUNT_NAME }}" -backend-config="container_name=terraform-state" -backend-config="key=remanufacturing.tfstate"
       working-directory: ./infra
 
     # Generate and show an execution plan
