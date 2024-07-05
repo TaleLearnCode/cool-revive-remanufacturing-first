@@ -11,17 +11,31 @@ jobs:
   terraform:
     runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+    defaults:
+      run:
+        shell: bash
 
-    - name: Set up Terraform
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # Log in to Azure
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    # Install the latest version of Terraform
+    - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
 
+    # Initialize the Terraform project
     - name: Terraform Init
-      run: terraform init
+      run: terraform init -backend-config="storage_account_name=${{ secrets.TERRAFORM_STORAGE_ACCOUNT_NAME }}" -backend-config="container_name=terraform-state" -backend-config="key=remanufacturing.tfstate" -backend-config="access_key=${{ secrets.TERRAFORM_STORAGE_ACCOUNT_KEY }}
       working-directory: ./infra
 
+    # Generate and show an execution plan
     - name: Terraform Plan
       run: terraform plan -out=tfplan
       working-directory: ./infra
@@ -29,8 +43,3 @@ jobs:
     - name: Terraform Apply
       run: terraform apply -auto-approve tfplan
       working-directory: ./infra
-
-    - name: Azure Login
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
