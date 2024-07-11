@@ -8,6 +8,9 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~>3.0"
     }
+    azapi = {
+      source = "Azure/azapi"
+    }
   }
   backend "azurerm" {
   }
@@ -175,4 +178,19 @@ module "function_app" {
 module "storage_account" {
   source        = "git::https://github.com/TaleLearnCode/azure-resource-types.git"
   resource_type = "storage-account"
+}
+
+module "communication_services" {
+  source        = "git::https://github.com/TaleLearnCode/azure-resource-types.git"
+  resource_type = "communication-services"
+}
+
+module "key_vault" {
+  source = "git::https://github.com/TaleLearnCode/azure-resource-types.git"
+  resource_type = "key-vault"
+}
+
+module "app_config" {
+  source = "git::https://github.com/TaleLearnCode/azure-resource-types.git"
+  resource_type = "app-configuration-store"
 }

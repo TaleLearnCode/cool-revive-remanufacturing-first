@@ -87,3 +87,25 @@ resource "azurerm_linux_function_app" "order_next_core" {
     application_insights_key               = azurerm_application_insights.app_insights.instrumentation_key
   }
 }
+
+
+
+
+
+
+resource "azurerm_servicebus_topic" "next_core_in_transit" {
+  name                      = "${module.service_bus_topic.name.abbreviation}-NextCoreInTransit-${var.azure_environment}-${module.azure_regions.region.region_short}"
+  namespace_id              = azurerm_servicebus_namespace.remanufacturing.id
+  support_ordering          = true
+  enable_batched_operations = true
+  depends_on = [ 
+    azurerm_servicebus_namespace.remanufacturing
+   ]
+}
+
+resource "azurerm_app_configuration_key" "notify_next_core_in_transit_topic_name" {
+  configuration_store_id = azurerm_app_configuration.remanufacturing.id
+  key                    = "ServiceBus:Topics:NextCoreInTransit"
+  label                  = var.azure_environment
+  value                  = azurerm_servicebus_topic.next_core_in_transit.name
+}

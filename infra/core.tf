@@ -69,6 +69,26 @@ resource "azurerm_servicebus_namespace" "remanufacturing" {
   tags                = local.tags
 }
 
+resource "azurerm_key_vault_secret" "service_bus_connection_string" {
+  name         = "ServiceBus-ConnectionString"
+  value        = azurerm_communication_service.notification_manager.primary_connection_string
+  key_vault_id = azurerm_key_vault.remanufacturing.id
+}
+
+resource "azurerm_app_configuration_key" "service_bus_connection_string" {
+  configuration_store_id = azurerm_app_configuration.remanufacturing.id
+  key                    = "ServiceBus:ConnectionString"
+  type                   = "vault"
+  label                  = var.azure_environment
+  vault_key_reference    = azurerm_key_vault_secret.service_bus_connection_string.versionless_id
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+}
+
+
 # #############################################################################
 # Log Analytics Workspace
 # #############################################################################
@@ -93,4 +113,48 @@ resource "azurerm_application_insights" "app_insights" {
   workspace_id        = azurerm_log_analytics_workspace.log_analytics.id
   application_type    = "web"
   tags                = local.tags
+}
+
+# #############################################################################
+# Key Vault
+# #############################################################################
+
+resource "azurerm_key_vault" "remanufacturing" {
+  name                        = lower("${module.key_vault.name.abbreviation}-Reman${var.resource_name_suffix}-${var.azure_environment}-${module.azure_regions.region.region_short}")
+  location                    = data.azurerm_resource_group.rg.location
+  resource_group_name         = data.azurerm_resource_group.rg.name
+  tenant_id                   = data.azurerm_client_config.current.tenant_id
+  soft_delete_retention_days  = 7
+  purge_protection_enabled    = true
+  sku_name                    = "standard"
+  enable_rbac_authorization  = true
+}
+
+resource "azurerm_role_assignment" "key_vault_administrator" {
+  scope                = azurerm_key_vault.remanufacturing.id
+  role_definition_name = "Key Vault Administrator"
+  principal_id         = data.azurerm_client_config.current.object_id
+}
+
+# #############################################################################
+# App Configuration
+# #############################################################################
+
+resource "azurerm_app_configuration" "remanufacturing" {
+  name                       = lower("${module.app_config.name.abbreviation}-Remanufacturing${var.resource_name_suffix}-${var.azure_environment}-${module.azure_regions.region.region_short}")
+  resource_group_name        = data.azurerm_resource_group.rg.name
+  location                   = data.azurerm_resource_group.rg.location
+  sku                        = "standard"
+  local_auth_enabled         = true
+  public_network_access      = "Enabled"
+  purge_protection_enabled   = false
+  soft_delete_retention_days = 1
+  tags = local.tags
+}
+
+# Role Assignment: 'App Configuration Data Owner' to current Terraform user
+resource "azurerm_role_assignment" "app_config_data_owner" {
+  scope                = azurerm_app_configuration.remanufacturing.id
+  role_definition_name = "App Configuration Data Owner"
+  principal_id         = data.azurerm_client_config.current.object_id
 }
