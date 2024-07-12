@@ -25,7 +25,7 @@ public class GetNextCore(ILogger<GetNextCore> logger, ProductionScheduleFacadeSe
 		try
 		{
 			_logger.LogInformation("Getting the next core on the production schedule.");
-			response = await _productionScheduleFacadeServices.GetNextCoreAsync2(podId, date, request.HttpContext.TraceIdentifier);
+			response = await _productionScheduleFacadeServices.GetNextCoreAsync(podId, date, request.HttpContext.TraceIdentifier);
 		}
 		catch (Exception ex)
 		{

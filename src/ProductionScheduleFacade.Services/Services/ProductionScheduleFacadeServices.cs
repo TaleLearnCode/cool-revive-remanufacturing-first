@@ -11,16 +11,7 @@ public class ProductionScheduleFacadeServices(TableClient tableClient)
 
 	private readonly TableClient _tableClient = tableClient;
 
-	public async Task<ProductionScheduleTableEntity?> GetNextCoreAsync(string podId, string date)
-	{
-		List<ProductionScheduleTableEntity> productionSchedule = _tableClient.Query<ProductionScheduleTableEntity>(x => x.PartitionKey == podId && x.Date == date && x.Status == "Scheduled").ToList();
-		productionSchedule.Sort((x, y) => x.Sequence.CompareTo(y.Sequence));
-		return productionSchedule.FirstOrDefault();
-	}
-
-
-
-	public async Task<IResponse> GetNextCoreAsync2(string podId, string date, string instance)
+	public async Task<IResponse> GetNextCoreAsync(string podId, string date, string instance)
 	{
 		try
 		{

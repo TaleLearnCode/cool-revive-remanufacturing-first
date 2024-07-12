@@ -35,6 +35,38 @@ resource "azurerm_app_configuration_key" "order_next_core_topic_name" {
   value                  = azurerm_servicebus_topic.order_next_core.name
 }
 
+# sbt-GetNextCore-dev-cus
+resource "azurerm_servicebus_topic" "get_next_core" {
+  name                      = "${module.service_bus_topic.name.abbreviation}-GetNextCore-${var.azure_environment}-${module.azure_regions.region.region_short}"
+  namespace_id              = azurerm_servicebus_namespace.remanufacturing.id
+  support_ordering          = true
+  enable_batched_operations = true
+  depends_on = [ 
+    azurerm_servicebus_namespace.remanufacturing
+   ]
+}
+
+resource "azurerm_app_configuration_key" "get_next_core_topic_name" {
+  configuration_store_id = azurerm_app_configuration.remanufacturing.id
+  key                    = "ServiceBus:Topics:GetNextCore"
+  label                  = var.azure_environment
+  value                  = azurerm_servicebus_topic.order_next_core.name
+}
+
+resource "azurerm_servicebus_subscription" "get_next_core" {
+  name               = "${module.service_bus_topic_subscription.name.abbreviation}-GetNextCore-${var.azure_environment}-${module.azure_regions.region.region_short}"
+  topic_id           = azurerm_servicebus_topic.get_next_core.id
+  max_delivery_count = 1
+}
+
+resource "azurerm_servicebus_subscription_rule" "example" {
+  name            = "${module.service_bus_topic_subscription.name.abbreviation}-GetNextCore_Pod123-${var.azure_environment}-${module.azure_regions.region.region_short}"
+  subscription_id = azurerm_servicebus_subscription.get_next_core.id
+  filter_type     = "SqlFilter"
+  sql_filter      = "podId = 'Pod123"
+}
+
+
 ## SendNextCoreRequestToWarehouse (ebt-SendNextCoreRequestToWarehouseXXX-dev-cus) -> OrderNextCore (sbt-OrderNextCore-dev-cus
 #resource "azurerm_eventgrid_event_subscription" "send_next_core_request_to_warehouse" {
 #  name                          = "SendNextCoreRequestToWarehouse"
