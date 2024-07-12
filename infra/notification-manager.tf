@@ -285,3 +285,32 @@ resource "azurerm_role_assignment" "notification_manager_app_configuration_data_
   role_definition_name = "App Configuration Data Owner"
   principal_id         = data.azurerm_linux_function_app.notification_manager_wrapper.identity.*.principal_id[0]
 }
+
+
+
+
+
+resource "azurerm_cosmosdb_sql_database" "inventory" {
+  name                = "inventory"
+  resource_group_name = azurerm_cosmosdb_account.cosmos.resource_group_name
+  account_name        = azurerm_cosmosdb_account.cosmos.name
+  throughput          = 400
+}
+
+resource "azurerm_cosmosdb_sql_container" "inventory" {
+  name                  = "inventory"
+  resource_group_name   = data.azurerm_cosmosdb_account.cosmos.resource_group_name
+  account_name          = data.azurerm_cosmosdb_account.cosmos.name
+  database_name         = azurerm_cosmosdb_sql_database.inventory.name
+  partition_key_paths = [ "podId" ]
+  throughput            = 400
+}
+
+resource "azurerm_cosmosdb_sql_container" "inventory_event_source" {
+  name                  = "inventory-eventsource"
+  resource_group_name   = data.azurerm_cosmosdb_account.cosmos.resource_group_name
+  account_name          = data.azurerm_cosmosdb_account.cosmos.name
+  database_name         = azurerm_cosmosdb_sql_database.inventory.name
+  partition_key_paths = [ "podId" ]
+  throughput            = 400
+}

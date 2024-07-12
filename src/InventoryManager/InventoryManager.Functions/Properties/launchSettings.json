@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "InventoryManager.Functions": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7198",
+      "launchBrowser": false
+    }
+  }
+}

@@ -42,7 +42,7 @@ resource "azurerm_api_management" "apim" {
 # #############################################################################
 
 resource "azurerm_cosmosdb_account" "cosmos" {
-  name                = lower("${module.cosmos_account.name.abbreviation}-CoolRevive${var.resource_name_suffix}-${var.azure_environment}-${module.azure_regions.region.region_short}")
+  name                = lower("${module.cosmos_account.name.abbreviation}-Remanufacturing${var.resource_name_suffix}-${var.azure_environment}-${module.azure_regions.region.region_short}")
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
   offer_type          = "Standard"
@@ -56,6 +56,28 @@ resource "azurerm_cosmosdb_account" "cosmos" {
   }
   tags = local.tags
 }
+
+resource "azurerm_app_configuration_key" "cosmos_endpoint" {
+  configuration_store_id = azurerm_app_configuration.remanufacturing.id
+  key                    = "ServiceBus:ConnectionString"
+  label                  = var.azure_environment
+  value                  = azurerm_cosmosdb_account.cosmos.endpoint
+}
+
+resource "azurerm_role_definition" "cosmos_read_write" {
+  name        = "Cosmos DB Account Read/Write"
+  scope       = data.azurerm_subscription.current.id
+  description = "Can read and write to Cosmos DB Account"
+  permissions {
+    actions = [
+      "Microsoft.DocumentDB/databaseAccounts/services/read",
+      "Microsoft.DocumentDB/databaseAccounts/services/write",
+      "Microsoft.DocumentDB/databaseAccounts/services/delete"
+    ]
+  }
+}
+
+
 
 # #############################################################################
 # Service Bus

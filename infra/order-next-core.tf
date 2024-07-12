@@ -28,6 +28,13 @@ resource "azurerm_servicebus_topic" "order_next_core" {
    ]
 }
 
+resource "azurerm_app_configuration_key" "order_next_core_topic_name" {
+  configuration_store_id = azurerm_app_configuration.remanufacturing.id
+  key                    = "ServiceBus:Topics:OrderNextCore"
+  label                  = var.azure_environment
+  value                  = azurerm_servicebus_topic.order_next_core.name
+}
+
 ## SendNextCoreRequestToWarehouse (ebt-SendNextCoreRequestToWarehouseXXX-dev-cus) -> OrderNextCore (sbt-OrderNextCore-dev-cus
 #resource "azurerm_eventgrid_event_subscription" "send_next_core_request_to_warehouse" {
 #  name                          = "SendNextCoreRequestToWarehouse"
