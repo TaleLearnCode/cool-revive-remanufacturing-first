@@ -52,7 +52,7 @@ resource "azurerm_resource_group" "warehouse" {
 
 # Storage account for the Warehouse system (replicating its data store)
 resource "azurerm_storage_account" "warehouse" {
-  name                     = "${module.storage_account.name.abbreviation}convey${var.resource_name_suffix}${var.azure_environment}${module.azure_regions.region.region_short}"
+  name                     = "${module.storage_account.name.abbreviation}warehouse${var.resource_name_suffix}${var.azure_environment}${module.azure_regions.region.region_short}"
   resource_group_name      = data.azurerm_resource_group.rg.name
   location                 = data.azurerm_resource_group.rg.location
   account_tier             = "Standard"

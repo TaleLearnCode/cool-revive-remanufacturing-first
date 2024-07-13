@@ -94,7 +94,7 @@ resource "azurerm_app_configuration_key" "communication_services_connection_stri
   }
 }
 
-resource "azurerm_servicebus_subscription" "notifiy_next_core_in_transit" {
+resource "azurerm_servicebus_subscription" "notify_next_core_in_transit" {
   name               = "${module.service_bus_topic_subscription.name.abbreviation}-NotifyNextCoreInTransit-${var.azure_environment}-${module.azure_regions.region.region_short}"
   topic_id           = azurerm_servicebus_topic.next_core_in_transit.id
   max_delivery_count = 1
@@ -126,7 +126,7 @@ resource "azurerm_storage_table" "contact_list" {
   storage_account_name = azurerm_storage_account.notification_manager.name
 }
 
-resource "azurerm_storage_table_entity" "example" {
+resource "azurerm_storage_table_entity" "contact_list_core_in_transit" {
   storage_table_id = azurerm_storage_table.contact_list.id
 
   partition_key = "pod123"
@@ -191,7 +191,7 @@ variable "notification_manager_instance_memory" {
   description = "The maximum amount of memory that the Notification Manager function app can use."
 }
 
-resource "azapi_resource" "notification_managre_function_app" {
+resource "azapi_resource" "notification_manager_function_app" {
   type                      = "Microsoft.Web/sites@2023-12-01"
   schema_validation_enabled = false
   location                  = var.azure_region
@@ -266,7 +266,7 @@ data "azurerm_linux_function_app" "notification_manager_wrapper" {
     resource_group_name = azurerm_resource_group.notification_manager.name
 }
 
-resource "azurerm_role_assignment" "notification_manager_function_storage_acccount" {
+resource "azurerm_role_assignment" "notification_manager_function_storage_account" {
   scope = azurerm_storage_account.notification_manager_function.id
   role_definition_name = "Storage Blob Data Owner"
   principal_id = data.azurerm_linux_function_app.notification_manager_wrapper.identity.0.principal_id

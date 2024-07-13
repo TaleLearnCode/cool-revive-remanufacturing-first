@@ -6,17 +6,6 @@
 # Step 1: Send Next Core Request to Warehouse Mesaging
 # ------------------------------------------------------------------------------
 
-# ebt-SendNextCoreRequestToWarehouseXXX-dev-cus
-resource "azurerm_eventgrid_topic" "send_next_core_request_to_warehouse" {
-  name                = "${module.event_grid_topic.name.abbreviation}-SendNextCoreRequestToWarehouse${var.resource_name_suffix}-${var.azure_environment}-${module.azure_regions.region.region_short}"
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
-  identity {
-    type = "SystemAssigned"
-  }
-  tags = local.tags
-}
-
 # sbt-OrderNextCore-dev-cus
 resource "azurerm_servicebus_topic" "order_next_core" {
   name                      = "${module.service_bus_topic.name.abbreviation}-OrderNextCore-${var.azure_environment}-${module.azure_regions.region.region_short}"
@@ -59,7 +48,7 @@ resource "azurerm_servicebus_subscription" "get_next_core" {
   max_delivery_count = 1
 }
 
-resource "azurerm_servicebus_subscription_rule" "example" {
+resource "azurerm_servicebus_subscription_rule" "get_next_core_pod123" {
   name            = "${module.service_bus_topic_subscription.name.abbreviation}-GetNextCore_Pod123-${var.azure_environment}-${module.azure_regions.region.region_short}"
   subscription_id = azurerm_servicebus_subscription.get_next_core.id
   filter_type     = "SqlFilter"
