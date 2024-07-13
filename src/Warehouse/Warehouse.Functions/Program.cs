@@ -1,11 +1,12 @@
 using Azure.Data.Tables;
-using Conveyance.Services;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Warehouse.Services;
 
 TableServiceClient tableServiceClient = new(Environment.GetEnvironmentVariable("StorageConnectionString"!));
-TableClient tableClient = tableServiceClient.GetTableClient(Environment.GetEnvironmentVariable("ConveyanceMissionTableName"!));
+TableClient warehouseTableClient = tableServiceClient.GetTableClient(Environment.GetEnvironmentVariable("WarehouseTableName"!));
+TableClient conveyanceTableClient = tableServiceClient.GetTableClient(Environment.GetEnvironmentVariable("ConveyanceMissionTableName"!));
 
 IHost host = new HostBuilder()
 	.ConfigureFunctionsWebApplication()
@@ -14,7 +15,7 @@ IHost host = new HostBuilder()
 		services.AddApplicationInsightsTelemetryWorkerService();
 		services.ConfigureFunctionsApplicationInsights();
 		services.AddHttpClient();
-		services.AddSingleton(new ConveyanceServices(tableClient, new Uri(Environment.GetEnvironmentVariable("NextCoreInTransitUrl")!)));
+		services.AddSingleton(new WarehouseServices(warehouseTableClient, conveyanceTableClient, new Uri(Environment.GetEnvironmentVariable("NextCoreInTransitUrl")!)));
 	})
 	.Build();
 

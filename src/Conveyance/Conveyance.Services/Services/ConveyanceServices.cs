@@ -1,4 +1,5 @@
 ﻿using Azure.Data.Tables;
+using Conveyance.Messages;
 using Conveyance.TableEntities;
 using System.Text;
 using System.Text.Json;
@@ -26,11 +27,25 @@ public class ConveyanceServices(TableClient tableClient, Uri nextCoreInTransitUr
 
 	private async Task NotifyCoreInTransit(HttpClient httpClient, ConveyanceMissionTableEntity conveyanceMission)
 	{
-		HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, _nextCoreInTransitUrl);
-		string serializedMission = JsonSerializer.Serialize(conveyanceMission);
-		request.Content = new StringContent(serializedMission, Encoding.UTF8, "application/json");
+
+		NextCoreInTransitMessage nextCoreInTransitMessage = new()
+		{
+			PodId = conveyanceMission.Destination,
+			CoreId = conveyanceMission.TagId,
+			Status = "in-transit",
+			StatusDateTime = DateTime.UtcNow
+		};
+		string serializedMessage = JsonSerializer.Serialize(nextCoreInTransitMessage);
+
+		HttpRequestMessage request = new(HttpMethod.Post, _nextCoreInTransitUrl)
+		{
+			Content = new StringContent(serializedMessage, Encoding.UTF8, "application/json")
+		};
+
 		HttpResponseMessage response = await httpClient.SendAsync(request);
+
 		response.EnsureSuccessStatusCode(); // TODO: In a real-world scenario, you would want to handle non-success status codes.
+
 	}
 
 }
